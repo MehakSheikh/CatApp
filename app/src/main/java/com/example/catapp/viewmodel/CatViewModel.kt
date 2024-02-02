@@ -1,13 +1,10 @@
 package com.example.catapp.viewmodel
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.catapp.api.CatBreedsApi
-import com.example.catapp.model.BreedsListItem
-import com.example.catapp.repository.CatsRepository
+import com.example.catapp.common.AppState
+import com.example.catapp.domain.BreedsListDomain
+import com.example.catapp.usecase.GetAllCatsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,16 +12,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class CatViewModel @Inject constructor(private val repository: CatsRepository) : ViewModel() {
+class CatViewModel @Inject constructor(private val repository: GetAllCatsUseCase) : ViewModel() {
 
-    val _catData: StateFlow<List<BreedsListItem>>
-        get() = repository.catData
+//    val _catData: Flow<State<List<BreedsListDomain>>>
+    private val catData = MutableStateFlow<AppState<List<BreedsListDomain>>>(value = AppState.loading())
 
     init {
         viewModelScope.launch {
-            repository.getCatsData()
+            repository.invoke().collect{catData.value=it }
         }
     }
-
+    fun catListState(): StateFlow<AppState<List<BreedsListDomain>>> = catData
 
 }
