@@ -14,7 +14,6 @@ import javax.inject.Inject
 @HiltViewModel
 class CatViewModel @Inject constructor(private val repository: GetAllCatsUseCase) : ViewModel() {
 
-//    val _catData: Flow<State<List<BreedsListDomain>>>
     private val catData = MutableStateFlow<AppState<List<BreedsListDomain>>>(value = AppState.loading())
 
     init {

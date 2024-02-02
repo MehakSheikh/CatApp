@@ -1,5 +1,6 @@
 package com.example.catapp
 
+import android.content.res.Resources.Theme
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,12 +15,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Yellow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -28,7 +32,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.catapp.ui.screens.BreedListScreen
 import com.example.catapp.ui.screens.ChosenBreedScreen
+import com.example.catapp.ui.theme.Black
 import com.example.catapp.ui.theme.CatAppTheme
+import com.example.catapp.ui.theme.Purple40
+import com.example.catapp.ui.theme.Purple80
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -39,9 +46,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CatAppTheme {
+                CatApp()
                 Scaffold(
                     topBar = {
-                        TopAppBar(title = {
+                        TopAppBar(
+                            colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer, titleContentColor = Color.White),
+                            title = {
                             Text(text = "Cat World")
                         },
                             navigationIcon = {
@@ -64,7 +74,6 @@ class MainActivity : ComponentActivity() {
                         CatApp()
                     }
                 }
-
             }
         }
     }
@@ -76,7 +85,7 @@ fun CatApp(){
 val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "breedlist"){
         composable(route = "breedlist"){
-            BreedListScreen {
+            BreedListScreen() {
                 navController.navigate("detail/${it}")
             }
         }
@@ -89,7 +98,7 @@ val navController = rememberNavController()
         )
         )
         {
-            ChosenBreedScreen()
+            ChosenBreedScreen(navController = navController)
         }
 
 
