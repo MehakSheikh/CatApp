@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
             CatAppTheme {
                 CatApp()
                 Scaffold(
-                    topBar = {
+                   /* topBar = {
                         TopAppBar(
                             colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer, titleContentColor = Color.White),
                             title = {
@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
 
 //                            Modifier.background(Color.White))
 
-                    }
+                    }*/
                 ) {
                     Box(modifier = Modifier.padding(it)){
                         CatApp()

@@ -1,4 +1,6 @@
 package com.example.catapp.usecase
+
+import androidx.lifecycle.SavedStateHandle
 import com.example.catapp.common.AppState
 import com.example.catapp.domain.BreedsListDomain
 import com.example.catapp.mappers.toDomain
@@ -6,14 +8,16 @@ import com.example.catapp.repository.CatsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class GetAllCatsUseCase(private val catsRepository: CatsRepository) {
-
+class GetChoosenBreedUseCase(
+    private val catsRepository: CatsRepository
+) {
+  //  val breedId = savedStateHandle.get<String>("breedId") ?: "beng"
     suspend fun invoke(): Flow<AppState<List<BreedsListDomain>>> = flow {
         emit(AppState.loading())
         try {
             emit(
                 AppState.idle(
-                    catsRepository.getCatsData().map { it.toDomain() }
+                  //  catsRepository.getSelectedBreedDetails("beng").map { it.toDomain() }
                 )
             )
         } catch (e: Exception) {
