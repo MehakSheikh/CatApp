@@ -1,4 +1,6 @@
-package com.example.catapp.domain
+package com.example.catapp.data.remote
+
+import com.example.catapp.model.BreedDto
 
 data class CatBreedsDto(
     val breedDto: List<BreedDto> ?= null,

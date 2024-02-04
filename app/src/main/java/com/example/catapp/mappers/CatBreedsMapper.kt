@@ -1,7 +1,7 @@
 package com.example.catapp.mappers
 
-import com.example.catapp.domain.CatBreedsDomain
-import com.example.catapp.domain.CatBreedsDto
+import com.example.catapp.model.CatBreedsDomain
+import com.example.catapp.model.CatBreedsDto
 
 fun CatBreedsDto.toDomain() = CatBreedsDomain(
     breeds = this.breedDto?.map { it.toDomain() } ?: emptyList(),

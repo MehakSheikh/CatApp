@@ -1,4 +1,4 @@
-package com.example.catapp.domain
+package com.example.catapp.model
 
 data class WeightDomain(
     val imperial: String,

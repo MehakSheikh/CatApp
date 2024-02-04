@@ -6,26 +6,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -35,11 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.catapp.domain.BreedsListDto
+import com.example.catapp.model.BreedsListDto
 import com.example.catapp.viewmodel.BreedViewModel
 
 
@@ -50,10 +44,19 @@ fun ChosenBreedScreen(navController: NavController) {
     val breedViewModel: BreedViewModel = hiltViewModel()
     val breeds: State<List<BreedsListDto>> = breedViewModel._breedsData.collectAsState()
 
-    Button(onClick = { navController.popBackStack() }) {
+  /*  Button(onClick = { navController.popBackStack() }) {
         Text("Go Back to Screen 1")
-    }
-
+    }*/
+    Row(
+        modifier = Modifier
+          //  .clickable(onClick = { showDialog.value = true })
+            .fillMaxWidth()
+            .height(IntrinsicSize.Max)
+            //  .padding(4.dp)
+            .background(color = Color.White),
+        horizontalArrangement = Arrangement.Center, // Center horizontally
+        verticalAlignment = Alignment.CenterVertically // Center vertically
+    ){}
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(8.dp),
@@ -102,6 +105,7 @@ fun BreedItems(breed: BreedsListDto) {
         AsyncImage(
             model = breed.url,
             contentDescription = "Image of Cat",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(190.dp)
                 .clip(CircleShape)

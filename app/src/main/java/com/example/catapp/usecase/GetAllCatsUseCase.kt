@@ -1,6 +1,6 @@
 package com.example.catapp.usecase
 import com.example.catapp.common.AppState
-import com.example.catapp.domain.BreedsListDomain
+import com.example.catapp.model.BreedsListDomain
 import com.example.catapp.mappers.toDomain
 import com.example.catapp.repository.CatsRepository
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +13,7 @@ class GetAllCatsUseCase(private val catsRepository: CatsRepository) {
         try {
             emit(
                 AppState.idle(
-                    catsRepository.getCatsData().map { it.toDomain() }
+                    catsRepository.getCatsData(1).map { it.toDomain() }
                 )
             )
         } catch (e: Exception) {

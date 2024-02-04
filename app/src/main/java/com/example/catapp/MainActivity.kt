@@ -25,17 +25,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Yellow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.catapp.ui.screens.BreedListScreen
 import com.example.catapp.ui.screens.ChosenBreedScreen
 import com.example.catapp.ui.theme.Black
 import com.example.catapp.ui.theme.CatAppTheme
 import com.example.catapp.ui.theme.Purple40
 import com.example.catapp.ui.theme.Purple80
+import com.example.catapp.viewmodel.CatViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -46,7 +49,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CatAppTheme {
-                CatApp()
+               // CatApp()
                 Scaffold(
                    /* topBar = {
                         TopAppBar(
@@ -71,6 +74,7 @@ class MainActivity : ComponentActivity() {
                     }*/
                 ) {
                     Box(modifier = Modifier.padding(it)){
+
                         CatApp()
                     }
                 }

@@ -1,7 +1,7 @@
 package com.example.catapp.mappers
 
-import com.example.catapp.domain.BreedDomain
-import com.example.catapp.domain.BreedDto
+import com.example.catapp.model.BreedDomain
+import com.example.catapp.model.BreedDto
 
 fun BreedDto.toDomain() = BreedDomain(
     healthIssues = this.health_issues ?: 0,

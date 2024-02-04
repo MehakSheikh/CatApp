@@ -3,7 +3,7 @@ package com.example.catapp.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.catapp.domain.BreedsListDto
+import com.example.catapp.model.BreedsListDto
 import com.example.catapp.repository.CatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
