@@ -1,47 +1,23 @@
 package com.example.catapp
 
-import android.content.Context
-import android.content.res.Resources.Theme
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Yellow
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.catapp.ui.screens.BreedListScreen
 import com.example.catapp.ui.screens.ChosenBreedScreen
-import com.example.catapp.ui.screens.checkInternetConnection
-import com.example.catapp.ui.theme.Black
+import com.example.catapp.ui.screens.mainSplash
 import com.example.catapp.ui.theme.CatAppTheme
-import com.example.catapp.ui.theme.Purple40
-import com.example.catapp.ui.theme.Purple80
-import com.example.catapp.viewmodel.CatViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -65,23 +41,28 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CatApp(){
-val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "breedlist"){
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "splashScreen"){
+
+        composable(route = "splashScreen"){
+            mainSplash(navController)
+        }
         composable(route = "breedlist"){
             BreedListScreen() {
                 navController.navigate("detail/${it}")
             }
         }
 
+
         composable(route = "detail/{breedId}",
-        arguments = listOf(
-            navArgument("breedId"){
-                type = NavType.StringType
-            }
-        )
+            arguments = listOf(
+                navArgument("breedId"){
+                    type = NavType.StringType
+                }
+            )
         )
         {
-          //  if(checkInternetConnection(context = LocalContext.current))
+            //  if(checkInternetConnection(context = LocalContext.current))
             ChosenBreedScreen(navController = navController)
 
         }

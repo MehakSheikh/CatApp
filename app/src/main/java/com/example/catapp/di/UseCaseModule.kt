@@ -2,7 +2,6 @@ package com.example.catapp.di
 
 import com.example.catapp.repository.CatsRepository
 import com.example.catapp.usecase.GetAllCatsUseCase
-import com.example.catapp.usecase.GetChoosenBreedUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

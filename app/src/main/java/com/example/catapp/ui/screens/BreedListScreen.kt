@@ -10,21 +10,14 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -35,23 +28,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,25 +48,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
 import coil.compose.AsyncImage
-import com.example.catapp.R
-import com.example.catapp.common.AppState
-import com.example.catapp.data.local.CatDataEntity
-import com.example.catapp.model.BreedsListDomain
-import com.example.catapp.model.BreedsListDto
+import com.example.catapp.ui.shimmerBrush
 import com.example.catapp.viewmodel.CatViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun BreedListScreen(onClick: (breedId: String) -> Unit) {
     val catViewModel: CatViewModel = hiltViewModel()
@@ -96,7 +75,18 @@ fun BreedListScreen(onClick: (breedId: String) -> Unit) {
 
         onDispose { /* cleanup */ }
     }
+    TopAppBar(
 
+        title = { Text(text = "Cat World") },
+
+        colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+
+    )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 60.dp) // Adjust top padding based on your design
+    ) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -125,15 +115,31 @@ fun BreedListScreen(onClick: (breedId: String) -> Unit) {
         // Load more button or trigger loading when reaching the end
         item {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize()
+                    .padding(10.dp)
+                ,
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.padding(8.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer
-                    )
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                        // .padding(bottom = 160.dp)  // Add padding to the bottom
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                            //   .fillMaxHeight()
+                            //   .padding(bottom = 16.dp)
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.padding(8.dp),
+                                color = MaterialTheme.colorScheme.primaryContainer
+                            )
+                        }
+                    }
                 } else {
                     Row {
                         Button(onClick = {
@@ -145,15 +151,12 @@ fun BreedListScreen(onClick: (breedId: String) -> Unit) {
                             Text("Load More")
                         }
                     }
-
                 }
             }
-
         }
     }
-
 }
-
+}
 
 @Composable
 fun CatItem(
@@ -166,14 +169,13 @@ fun CatItem(
 ) {
     var isInternetConnected by remember { mutableStateOf(false) }
     val context = LocalContext.current
-
+    val showShimmer = remember { mutableStateOf(true) }
 
     DisposableEffect(context) {
         isInternetConnected = checkInternetConnection(context)
 
         onDispose { /* cleanup */ }
     }
-    Log.d("Mehak checking", "inside the function")
     Row(
         modifier = Modifier
             .clickable {
@@ -181,8 +183,6 @@ fun CatItem(
                     onClick(breedId)
                 else {
                     showToast(context = context, "Please connect to Internet")
-
-                    //Log.d("NO INTERNER", breedId)
                 }
             }
             .fillMaxWidth()
@@ -191,14 +191,16 @@ fun CatItem(
             .background(MaterialTheme.colorScheme.primary)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
-        AnimatedImage(
-            model = asynchImag ?: "",
-            contentDescription = "",
+        AsyncImage(
+            model = asynchImag,
+            contentDescription = "Cat Image",
             modifier = Modifier
+                .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value))
                 .size(190.dp)
                 .clip(CircleShape)
-                .padding(8.dp),
-            placeholder = R.drawable.catimage
+                .padding(12.dp),
+            onSuccess = { showShimmer.value = false },
+            contentScale = ContentScale.Crop
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column(
@@ -234,6 +236,7 @@ fun CatItem(
 fun AnimatedImage(
     model: String,
     contentDescription: String,
+    contentScale: ContentScale,
     modifier: Modifier = Modifier,
     placeholder: Int
 ) {

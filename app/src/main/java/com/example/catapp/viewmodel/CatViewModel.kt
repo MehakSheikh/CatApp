@@ -22,7 +22,6 @@ import javax.inject.Inject
 @HiltViewModel
 class CatViewModel @Inject constructor(private val repository: CatsRepository, private val catDao: CatDAO,application:Application) : ViewModel() {
 
-
     private val _cats = MutableStateFlow<List<BreedsListDto>>(emptyList())
     val cats: StateFlow<List<BreedsListDto>> get() = _cats.asStateFlow()
 

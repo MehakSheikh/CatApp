@@ -12,9 +12,9 @@ import javax.inject.Inject
 
 class CatsRepository @Inject constructor(private val catApiService: CatBreedsApi,private val catDao: CatDAO) {
 
-    private val _breedData = MutableStateFlow<List<BreedsListDto>>(emptyList())
+    private val breedsData = MutableStateFlow<List<BreedsListDto>>(emptyList())
     val breedData: StateFlow<List<BreedsListDto>>
-        get() = _breedData
+        get() = breedsData
 
     suspend fun getCatsData(pageNumber:Int) : List<BreedsListDto>{
         val catlist = catApiService.getCatsData(
@@ -44,7 +44,7 @@ class CatsRepository @Inject constructor(private val catApiService: CatBreedsApi
 
         Log.d("breed list",breedList.toString())
         if (breedList.isEmpty() != null) {
-            _breedData.emit(breedList)
+            breedsData.emit(breedList)
             return breedList
         }
         else{

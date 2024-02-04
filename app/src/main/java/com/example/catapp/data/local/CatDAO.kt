@@ -14,12 +14,11 @@ interface CatDAO {
     @Query("SELECT DISTINCT * FROM CatDataEntity")
     fun getAllCatsPaging(): PagingSource<Int, CatDataEntity>
 
-
     @Query("DELETE FROM CatDataEntity")
     suspend fun clearAll()
 
-    @Query("SELECT * FROM CatDataEntity")
-    suspend fun getAllCats(): List<CatDataEntity>
+    /*@Query("SELECT * FROM CatDataEntity")
+    suspend fun getAllCats(): List<CatDataEntity>*/
 
     // for loading 10 records at a time
     @Query("SELECT * FROM CatDataEntity ORDER BY id LIMIT :pageSize OFFSET :offset")

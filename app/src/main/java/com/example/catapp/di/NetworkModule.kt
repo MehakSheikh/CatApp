@@ -21,7 +21,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
 
-
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
@@ -58,7 +57,7 @@ class NetworkModule {
         return Room.databaseBuilder(
             context.applicationContext,
             CatDatabase::class.java,
-            "catDatabase" // Specify your desired database name
+            "catDatabase" // database name
         )
             .build()
     }

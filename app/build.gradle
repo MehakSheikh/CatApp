@@ -103,4 +103,7 @@ dependencies {
 
     implementation "androidx.lifecycle:lifecycle-livedata:2.7.0"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0-alpha01"
+
+    ///lottie
+    implementation("com.airbnb.android:lottie-compose:6.0.1")
 }
