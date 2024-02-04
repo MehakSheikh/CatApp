@@ -1,20 +1,16 @@
 package com.example.catapp.repository
 
 import android.util.Log
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import com.example.catapp.data.remote.CatBreedsApi
 import com.example.catapp.constants.Constant
 import com.example.catapp.model.BreedsListDto
 import com.example.catapp.data.local.CatDAO
 import com.example.catapp.data.local.CatDataEntity
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
-class CatsRepository @Inject constructor(private val catApiService: CatBreedsApi, private val catDao: CatDAO) {
+class CatsRepository @Inject constructor(private val catApiService: CatBreedsApi,private val catDao: CatDAO) {
 
     private val _breedData = MutableStateFlow<List<BreedsListDto>>(emptyList())
     val breedData: StateFlow<List<BreedsListDto>>
@@ -27,33 +23,33 @@ class CatsRepository @Inject constructor(private val catApiService: CatBreedsApi
             pageNumber,
             Constant.apiKey
         )
-        Log.d("mehak testing",catlist.toString())
 
         mapResponseToEntities(catlist)
-        logAllCats()
 
         return catApiService.getCatsData(
             10,
             1,
-            1,
+            pageNumber,
             Constant.apiKey
         )
-
     }
 
-    suspend fun getSelectedBreedDetails(breedId: String) {
+    suspend fun getSelectedBreedDetails(breedId: String,pageNumber: Int) : List<BreedsListDto>{
         val breedList = catApiService.getBreeds(
             50,
             breedId,
+            pageNumber,
             Constant.apiKey
         )
 
         Log.d("breed list",breedList.toString())
-        if (breedList.isEmpty() != null)
+        if (breedList.isEmpty() != null) {
             _breedData.emit(breedList)
-
-
-
+            return breedList
+        }
+        else{
+            return emptyList()
+        }
     }
 
     suspend fun mapResponseToEntities(breedList: List<BreedsListDto>) {
@@ -72,7 +68,6 @@ class CatsRepository @Inject constructor(private val catApiService: CatBreedsApi
                 temperament = breed.breeds[0].temperament,
                 imageUrl = breed.url
             )
-
             catEntities.add(catEntity)
         }
         try {
@@ -82,28 +77,4 @@ class CatsRepository @Inject constructor(private val catApiService: CatBreedsApi
             Log.e("Mehak log cat", "Error inserting data into Room: ${e.message}", e)
         }
     }
-
-    fun getPagingData(): Flow<PagingData<CatDataEntity>> {
-        return Pager(
-            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-            pagingSourceFactory = { catDao.getAllCatsPaging() }
-        ).flow
-    }
-
-
-    ////this function is only for testing purposes'breedList.isEmpty() != null
-    suspend fun logAllCats() {
-        Log.d("mehak log ","testing 3")
-        try {
-            val catsList: List<CatDataEntity> = catDao.getAllCats() // Replace with the actual function to get all cats
-
-            for (cat in catsList) {
-                // Log each cat's information
-                Log.d("CatInfo from repo Mehak", "ID: ${cat.id}, Name: ${cat.name}, Origin: ${cat.origin}, Life Span: ${cat.lifeSpan}")
-            }
-        } catch (e: Exception) {
-            Log.e("CatInfo", "Error logging cats: ${e.message}", e)
-        }
-    }
-
 }

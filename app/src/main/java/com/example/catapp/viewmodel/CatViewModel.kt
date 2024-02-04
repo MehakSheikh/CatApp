@@ -4,41 +4,38 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.cachedIn
-import androidx.paging.map
-import com.example.catapp.common.AppState
 import com.example.catapp.data.local.CatDAO
 import com.example.catapp.data.local.CatDataEntity
-import com.example.catapp.model.BreedsListDomain
 import com.example.catapp.model.BreedsListDto
 import com.example.catapp.repository.CatsRepository
-import com.example.catapp.usecase.GetAllCatsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
 @HiltViewModel
-class CatViewModel @Inject constructor(
-    private val repository: CatsRepository,
-    private val catDao: CatDAO, application: Application
-) : ViewModel() {
+class CatViewModel @Inject constructor(private val repository: CatsRepository, private val catDao: CatDAO,application:Application) : ViewModel() {
+
+
     private val _cats = MutableStateFlow<List<BreedsListDto>>(emptyList())
     val cats: StateFlow<List<BreedsListDto>> get() = _cats.asStateFlow()
+
+    private val _catDataFromRoom = MutableStateFlow<List<CatDataEntity>>(emptyList())
+    val catDataFromRoom: StateFlow<List<CatDataEntity>> get() = _catDataFromRoom.asStateFlow()
+
 
     private val context = application.applicationContext
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading.asStateFlow()
 
     private var currentPage = 1
+    private var roomPage = 1
 
     init {
         loadCats()
@@ -48,12 +45,27 @@ class CatViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _isLoading.value = true
+                val totalSize = catDao.getTotalSize()
+
                 if (isInternetAvailable(context)) {
                     val newCats = repository.getCatsData(currentPage)
                     _cats.value = _cats.value + newCats
                     currentPage++
                 } else {
+                    val pageSize = 10
+                    val offset = roomPage * pageSize
+                    var totalCountFromRoom = 10
+                    val localCats = catDao.getPaginatedCats(pageSize, offset)
+                    Log.d("data in without internet Mehak", localCats.toString())
+                    _catDataFromRoom.value = _catDataFromRoom.value + localCats
+                    if (totalSize >= totalCountFromRoom) {
 
+                        return@launch
+                    } else {
+                        roomPage++
+                    }
+
+                    totalCountFromRoom = totalCountFromRoom + 10
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -72,5 +84,4 @@ class CatViewModel @Inject constructor(
             capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
         }
     }
-
 }

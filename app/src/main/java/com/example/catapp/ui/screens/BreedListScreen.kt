@@ -1,5 +1,11 @@
 package com.example.catapp.ui.screens
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -39,9 +45,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -54,6 +62,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -69,102 +78,122 @@ import com.example.catapp.model.BreedsListDomain
 import com.example.catapp.model.BreedsListDto
 import com.example.catapp.viewmodel.CatViewModel
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BreedListScreen(onClick: (breedId: String) -> Unit) {
     val catViewModel: CatViewModel = hiltViewModel()
 
     val cats by catViewModel.cats.collectAsState()
+    val roomCat by catViewModel.catDataFromRoom.collectAsState()
     val isLoading by catViewModel.isLoading.collectAsState()
 
- /*   Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = "Cat World", style = MaterialTheme.typography.headlineMedium)
-                },
-                modifier = Modifier.background(color = MaterialTheme.colorScheme.primary)
-            )
-        }
-    ) {*/
-        LazyColumn(modifier = Modifier
+    var isInternetConnected by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+
+    DisposableEffect(context) {
+        isInternetConnected = checkInternetConnection(context)
+
+        onDispose { /* cleanup */ }
+    }
+
+    LazyColumn(
+        modifier = Modifier
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.primary)
-        ) {
+    ) {
+        if (isInternetConnected) {
             items(cats) { cat ->
-                CatItem(cat, onClick = onClick)
-            }
+                CatItem(
+                    cat.breeds!![0].id!!,
+                    cat.url!!, cat.breeds[0].name!!,
+                    cat.breeds[0].life_span!!, cat.breeds[0].origin!!, onClick = onClick
+                )
 
-            // Load more button or trigger loading when reaching the end
-            item {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.padding(8.dp)
-                            ,color = MaterialTheme.colorScheme.primaryContainer)
-                    } else {
-                        Row {
-                            Button(onClick = { catViewModel.loadCats() }) {
-                                Text("Load More")
+            }
+        } else {
+            items(roomCat) { cat ->
+                cat.imageUrl?.let {
+                    CatItem(
+                        cat.id, it, cat.name!!, cat.lifeSpan!!, cat.origin!!, onClick = onClick
+                    )
+                }
+
+            }
+        }
+
+        // Load more button or trigger loading when reaching the end
+        item {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.padding(8.dp),
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    )
+                } else {
+                    Row {
+                        Button(onClick = {
+                            if (isInternetConnected) catViewModel.loadCats() else {
+                                showToast(context = context, "Please connect to Internet")
+                                Log.d("Mehak internet check on load more", "")
                             }
+                        }) {
+                            Text("Load More")
                         }
                     }
+
                 }
             }
-        }
-  //  }
-}
 
-@Composable
-fun AnimatedItem(index: BreedsListDomain) {
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(key1 = index) {
-        isVisible = true
-    }
-
-    AnimatedVisibility(
-        visible = isVisible,
-        enter = slideInVertically(initialOffsetY = { -40 }) + fadeIn() + scaleIn(),
-        exit = slideOutVertically(targetOffsetY = { -40 }) + fadeOut() + scaleOut()
-
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(8.dp)
-                .background(Color.Gray)
-        ) {
-            Text(
-                text = "Item $index",
-                color = Color.White,
-                modifier = Modifier.align(Alignment.Center)
-            )
         }
     }
+
 }
 
-@Composable
-fun CatItem(cats: BreedsListDto, onClick: (breedId: String) -> Unit) {
 
+@Composable
+fun CatItem(
+    breedId: String,
+    asynchImag: String,
+    breedName: String,
+    breedLifespan: String,
+    breedOrigin: String,
+    onClick: (breedId: String) -> Unit
+) {
+    var isInternetConnected by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+
+    DisposableEffect(context) {
+        isInternetConnected = checkInternetConnection(context)
+
+        onDispose { /* cleanup */ }
+    }
+    Log.d("Mehak checking", "inside the function")
     Row(
         modifier = Modifier
             .clickable {
-                onClick(cats.breeds!![0].id!!)
+                if (isInternetConnected)
+                    onClick(breedId)
+                else {
+                    showToast(context = context, "Please connect to Internet")
+
+                    //Log.d("NO INTERNER", breedId)
+                }
             }
+            .fillMaxWidth()
             .height(IntrinsicSize.Max)
             .padding(4.dp)
             .background(MaterialTheme.colorScheme.primary)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
         AnimatedImage(
-            model = cats.url ?: "",
+            model = asynchImag ?: "",
             contentDescription = "",
-            // contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(190.dp)
                 .clip(CircleShape)
@@ -179,74 +208,25 @@ fun CatItem(cats: BreedsListDto, onClick: (breedId: String) -> Unit) {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = cats.breeds!![0].name ?: "",
+                text = breedName ?: "",
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.primaryContainer,
                 modifier = Modifier.fillMaxWidth()
             )
-            //  Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Life Span: ${cats.breeds[0].life_span ?: ""}",
+                text = "Life Span: ${breedLifespan ?: ""}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primaryContainer,
                 modifier = Modifier.fillMaxWidth()
             )
-            //  Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Origin: ${cats.breeds[0].origin ?: ""}",
-//                        text = "Origin: United States" ,
+                text = "Origin: ${breedOrigin ?: ""}",
                 color = MaterialTheme.colorScheme.primaryContainer,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(4.dp))
-
         }
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun LoadingIndicator() {
-    Box(
-        modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.primary)
-            .fillMaxSize(1f),
-        contentAlignment = Alignment.Center
-    ) {
-        AnimatedText(
-            text = "CATLOPEDIA",
-            style = MaterialTheme.typography.displayLarge,
-            color = MaterialTheme.colorScheme.primaryContainer,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-fun AnimatedText(
-    text: String,
-    style: TextStyle,
-    color: Color,
-    fontWeight: FontWeight
-) {
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(text) {
-        isVisible = true
-    }
-
-    AnimatedVisibility(
-        visible = isVisible,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        Text(
-            text = text,
-            style = style,
-            color = color,
-            fontWeight = fontWeight
-        )
     }
 }
 
@@ -254,7 +234,6 @@ fun AnimatedText(
 fun AnimatedImage(
     model: String,
     contentDescription: String,
-    // contentScale: String,
     modifier: Modifier = Modifier,
     placeholder: Int
 ) {
@@ -293,4 +272,22 @@ fun AnimatedImage(
             )
         }
     }
+}
+
+fun checkInternetConnection(context: Context): Boolean {
+    val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        val network = connectivityManager.activeNetwork
+        val capabilities = connectivityManager.getNetworkCapabilities(network)
+        return capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+    } else {
+        val networkInfo = connectivityManager.activeNetworkInfo
+        return networkInfo?.isConnected == true
+    }
+}
+
+fun showToast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }

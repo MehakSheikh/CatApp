@@ -15,5 +15,6 @@ interface CatBreedsApi {
     @GET("/v1/images/search")
     suspend fun getBreeds(@Query("limit") limit: Int,
                           @Query("breed_ids") breed_ids: String,
+                          @Query("page") page: Int,
                           @Query("api_key") api_key: String): List<BreedsListDto>
 }
