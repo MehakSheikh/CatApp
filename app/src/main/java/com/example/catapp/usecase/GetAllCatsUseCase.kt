@@ -13,7 +13,7 @@ class GetAllCatsUseCase(private val catsRepository: CatsRepository) {
         try {
             emit(
                 AppState.idle(
-                    catsRepository.getCatsData(1).map { it.toDomain() }
+                    catsRepository.getCatsData(1).map { it.toDomain() } //mapping data from API to our Domain function for consuming it on our UI
                 )
             )
         } catch (e: Exception) {

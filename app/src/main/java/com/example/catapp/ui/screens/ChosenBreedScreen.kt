@@ -40,12 +40,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
+import com.example.catapp.R
 import com.example.catapp.model.BreedsListDto
 import com.example.catapp.ui.shimmerBrush
 import com.example.catapp.viewmodel.BreedViewModel
@@ -64,7 +67,14 @@ fun ChosenBreedScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.primary)
+          //  .background(color = MaterialTheme.colorScheme.primary)
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primaryContainer,
+                        MaterialTheme.colorScheme.primary
+                    )
+                ))
     ) {
         // TopAppBar with a back button
         TopAppBar(
@@ -108,7 +118,7 @@ fun ChosenBreedScreen(navController: NavController) {
                     contentPadding = PaddingValues(8.dp),
                     verticalArrangement = Arrangement.SpaceAround,
                     modifier = Modifier
-                        .background(color = MaterialTheme.colorScheme.primary),
+                       // .background(color = MaterialTheme.colorScheme.primary),
                 ) {
                     items(breeds.value) {
                         BreedItems(breed = it)
@@ -121,31 +131,30 @@ fun ChosenBreedScreen(navController: NavController) {
 
                             // Expand to fill the entire height
                             // .padding(bottom = 160.dp)  // Add padding to the bottom
-                        ){
-                        Row(
-                            modifier = Modifier.fillMaxSize(),
                         ) {
+                            Row(
+                                modifier = Modifier.fillMaxSize(),
+                            ) {
 
-                            if (isLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .padding(8.dp)
-                                        .size(50.dp)
-                                    , color = MaterialTheme.colorScheme.primaryContainer
-                                )
-                                //  CircularProgressIndicator(modifier = Modifier.padding(8.dp))
-                            } else {
+                                if (isLoading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .padding(8.dp)
+                                            .size(50.dp),
+                                        color = MaterialTheme.colorScheme.primaryContainer
+                                    )
+                                    //  CircularProgressIndicator(modifier = Modifier.padding(8.dp))
+                                } else {
 
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                ) {
-                                    Button(onClick = { breedViewModel.loadBreedSpecificCats() }) {
-                                        Text("Load More")
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                    ) {
+                                        Button(onClick = { breedViewModel.loadBreedSpecificCats() }) {
+                                            Text(stringResource(id = R.string.load_more))                                        }
                                     }
                                 }
-                            }
 
-                        }
+                            }
 
                         }
                     }
@@ -175,7 +184,8 @@ fun BreedItems(breed: BreedsListDto) {
             .fillMaxWidth()
             .height(IntrinsicSize.Max)
             //  .padding(4.dp)
-            .background(color = MaterialTheme.colorScheme.primary),
+           // .background(color = MaterialTheme.colorScheme.primary)
+                ,
         horizontalArrangement = Arrangement.Center, // Center horizontally
         verticalAlignment = Alignment.CenterVertically // Center vertically
     ) {
@@ -185,15 +195,16 @@ fun BreedItems(breed: BreedsListDto) {
             model = breed.url,
             contentDescription = "Cat Image",
             modifier = Modifier
-                .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value))
                 .size(190.dp)
                 .clip(CircleShape)
-                .padding(12.dp),
+                .padding(12.dp)
+                .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value)),
             onSuccess = { showShimmer.value = false },
             contentScale = ContentScale.Crop
         )
     }
 }
+
 @Composable
 fun Alert(
     name: String,

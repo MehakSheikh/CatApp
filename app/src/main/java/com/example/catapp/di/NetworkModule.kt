@@ -33,7 +33,7 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun providesRetrofit(): Retrofit {
+    fun providesRetrofit(): Retrofit {      //API
         return Retrofit.Builder().baseUrl(Constant.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -41,19 +41,19 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun providesCatBreedApi(retrofit: Retrofit): CatBreedsApi {
+    fun providesCatBreedApi(retrofit: Retrofit): CatBreedsApi {     //retrofit/api call
         return retrofit.create(CatBreedsApi::class.java)
     }
 
     @Singleton
     @Provides
-    fun provideCatDao(database: CatDatabase): CatDAO {
+    fun provideCatDao(database: CatDatabase): CatDAO {  //room
         return database.catDao
     }
 
     @Singleton
     @Provides
-    fun provideCatDatabase(@ApplicationContext context: Context): CatDatabase {
+    fun provideCatDatabase(@ApplicationContext context: Context): CatDatabase {     //room
         return Room.databaseBuilder(
             context.applicationContext,
             CatDatabase::class.java,

@@ -68,7 +68,7 @@ dependencies {
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
-    // Coil Compose
+    // Coil Compose for Images
     implementation "io.coil-kt:coil-compose:2.2.2"
 
     implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.1"

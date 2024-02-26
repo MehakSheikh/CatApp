@@ -48,18 +48,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.example.catapp.R
 import com.example.catapp.ui.shimmerBrush
 import com.example.catapp.viewmodel.CatViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun BreedListScreen(onClick: (breedId: String) -> Unit) {
+
     val catViewModel: CatViewModel = hiltViewModel()
 
     val cats by catViewModel.cats.collectAsState()
@@ -69,18 +73,14 @@ fun BreedListScreen(onClick: (breedId: String) -> Unit) {
     var isInternetConnected by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-
     DisposableEffect(context) {
         isInternetConnected = checkInternetConnection(context)
-
         onDispose { /* cleanup */ }
     }
+
     TopAppBar(
-
         title = { Text(text = "Cat World") },
-
         colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-
     )
     Column(
         modifier = Modifier
@@ -90,7 +90,14 @@ fun BreedListScreen(onClick: (breedId: String) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.primary)
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primaryContainer,
+                        MaterialTheme.colorScheme.primary
+                    )
+                )
+            )
     ) {
         if (isInternetConnected) {
             items(cats) { cat ->
@@ -115,7 +122,8 @@ fun BreedListScreen(onClick: (breedId: String) -> Unit) {
         // Load more button or trigger loading when reaching the end
         item {
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .padding(10.dp)
                 ,
                 verticalArrangement = Arrangement.Center,
@@ -144,11 +152,12 @@ fun BreedListScreen(onClick: (breedId: String) -> Unit) {
                     Row {
                         Button(onClick = {
                             if (isInternetConnected) catViewModel.loadCats() else {
-                                showToast(context = context, "Please connect to Internet")
+                                showToast(context = context, message = context.getString(R.string.connect_to_internet))
+
                                 Log.d("Mehak internet check on load more", "")
                             }
                         }) {
-                            Text("Load More")
+                            Text(stringResource(id = R.string.load_more))
                         }
                     }
                 }
@@ -173,7 +182,6 @@ fun CatItem(
 
     DisposableEffect(context) {
         isInternetConnected = checkInternetConnection(context)
-
         onDispose { /* cleanup */ }
     }
     Row(
@@ -182,23 +190,23 @@ fun CatItem(
                 if (isInternetConnected)
                     onClick(breedId)
                 else {
-                    showToast(context = context, "Please connect to Internet")
+                    showToast(context = context, message = context.getString(R.string.connect_to_internet))
                 }
             }
             .fillMaxWidth()
             .height(IntrinsicSize.Max)
             .padding(4.dp)
-            .background(MaterialTheme.colorScheme.primary)
+           // .background(MaterialTheme.colorScheme.primary)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
         AsyncImage(
             model = asynchImag,
             contentDescription = "Cat Image",
             modifier = Modifier
-                .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value))
                 .size(190.dp)
                 .clip(CircleShape)
-                .padding(12.dp),
+                .padding(12.dp)
+                .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value)),
             onSuccess = { showShimmer.value = false },
             contentScale = ContentScale.Crop
         )
@@ -228,51 +236,6 @@ fun CatItem(
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(4.dp))
-        }
-    }
-}
-
-@Composable
-fun AnimatedImage(
-    model: String,
-    contentDescription: String,
-    contentScale: ContentScale,
-    modifier: Modifier = Modifier,
-    placeholder: Int
-) {
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(model) {
-        isVisible = true
-    }
-
-    Box(
-        modifier = modifier
-    ) {
-        if (isVisible) {
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = fadeIn(
-                    initialAlpha = 0.3f,
-                    animationSpec = tween(durationMillis = 500)
-                ),
-                exit = fadeOut(
-                    targetAlpha = 0.3f,
-                    animationSpec = tween(durationMillis = 500)
-                )
-            ) {
-                AsyncImage(
-                    model = model,
-                    contentDescription = contentDescription,
-                    modifier = modifier
-                )
-            }
-        } else {
-            Image(
-                painter = painterResource(id = placeholder),
-                contentDescription = contentDescription,
-                modifier = modifier
-            )
         }
     }
 }

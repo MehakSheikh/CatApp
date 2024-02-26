@@ -11,11 +11,11 @@ interface CatDAO {
     @Upsert
     suspend fun upsertAll(cats: List<CatDataEntity>)
 
-    @Query("SELECT DISTINCT * FROM CatDataEntity")
+  /*  @Query("SELECT DISTINCT * FROM CatDataEntity")
     fun getAllCatsPaging(): PagingSource<Int, CatDataEntity>
 
     @Query("DELETE FROM CatDataEntity")
-    suspend fun clearAll()
+    suspend fun clearAll()*/
 
     /*@Query("SELECT * FROM CatDataEntity")
     suspend fun getAllCats(): List<CatDataEntity>*/

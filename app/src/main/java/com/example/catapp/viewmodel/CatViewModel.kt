@@ -19,19 +19,27 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+
 @HiltViewModel
-class CatViewModel @Inject constructor(private val repository: CatsRepository, private val catDao: CatDAO,application:Application) : ViewModel() {
+class CatViewModel @Inject constructor(
+    private val repository: CatsRepository,
+    private val catDao: CatDAO,
+    application: Application
+) : ViewModel() {
 
     private val _cats = MutableStateFlow<List<BreedsListDto>>(emptyList())
-    val cats: StateFlow<List<BreedsListDto>> get() = _cats.asStateFlow()
+    val cats: StateFlow<List<BreedsListDto>>
+        get() = _cats.asStateFlow()
 
     private val _catDataFromRoom = MutableStateFlow<List<CatDataEntity>>(emptyList())
-    val catDataFromRoom: StateFlow<List<CatDataEntity>> get() = _catDataFromRoom.asStateFlow()
-
+    val catDataFromRoom: StateFlow<List<CatDataEntity>>
+        get() = _catDataFromRoom.asStateFlow()
 
     private val context = application.applicationContext
+
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> get() = _isLoading.asStateFlow()
+    val isLoading: StateFlow<Boolean>
+        get() = _isLoading.asStateFlow()
 
     private var currentPage = 1
     private var roomPage = 1
@@ -50,7 +58,7 @@ class CatViewModel @Inject constructor(private val repository: CatsRepository, p
                     val newCats = repository.getCatsData(currentPage)
                     _cats.value = _cats.value + newCats
                     currentPage++
-                } else {
+                } else {    //checking if all images have been shown or not.
                     val pageSize = 10
                     val offset = roomPage * pageSize
                     var totalCountFromRoom = 10

@@ -20,13 +20,14 @@ class BreedViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _breedsData = MutableStateFlow<List<BreedsListDto>>(emptyList())
-    val breedsData: StateFlow<List<BreedsListDto>> get() = _breedsData.asStateFlow()
+    val breedsData: StateFlow<List<BreedsListDto>>
+        get() = _breedsData.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> get() = _isLoading.asStateFlow()
+    val isLoading: StateFlow<Boolean>
+        get() = _isLoading.asStateFlow()
 
     init {
-
         loadBreedSpecificCats()
     }
 
@@ -36,10 +37,10 @@ class BreedViewModel @Inject constructor(
             try {
                 _isLoading.value = true
                 val breedId = savedStateHandle.get<String>("breedId") ?: "beng"
-                val newCats = repository.getSelectedBreedDetails(breedId,currentPage)
+                val newCats = repository.getSelectedBreedDetails(breedId, currentPage)
 
                 _breedsData.value = breedsData.value + newCats
-                Log.d("checking breed detail mehak",breedsData.value.toString())
+                Log.d("checking breed detail mehak", breedsData.value.toString())
                 currentPage++
 
             } catch (e: Exception) {
